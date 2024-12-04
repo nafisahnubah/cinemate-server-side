@@ -33,18 +33,47 @@ async function run() {
       res.send(result);
     });
 
-    app.delete('/movie/:id', async(req, res) => {
+    app.get('/movie/:id', async(req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
-      const result = await movieCollection.deleteOne(query);
+      const query = {_id: new ObjectId(id)};
+      const result = await movieCollection.findOne(query);
       res.send(result);
-    })
+    });
 
     app.post('/addmovie', async(req, res) => {
         const newMovie = req.body;
         console.log(newMovie)
         const result = await movieCollection.insertOne(newMovie);
         res.send(result);
+    });
+
+    app.put('/movie/:id', async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const options = {upsert : true}
+      const updatedMovie = req.body;
+
+      const movie = {
+        $set: {
+          title: updatedMovie.title,
+          genre: updatedMovie.genre,
+          poster: updatedMovie.poster,
+          duration: updatedMovie.duration,
+          year: updatedMovie.year,
+          rating: updatedMovie.rating,
+          summary: updatedMovie.summary
+        }
+      }
+
+      const result = await movieCollection.updateOne(filter, movie, options);
+      res.send(result);
+    })
+
+    app.delete('/movie/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await movieCollection.deleteOne(query);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
