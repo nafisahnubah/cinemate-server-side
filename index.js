@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://nafisahnubah:${process.env.DB_PASSWORD}@cluster0.300zx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.300zx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -26,6 +26,7 @@ async function run() {
     await client.connect();
 
     const movieCollection = client.db('movieDB').collection('movie');
+    const userCollection = client.db('movieDB').collection('user');
 
     app.get('/addmovie', async(req, res) => {
       const cursor = movieCollection.find();
@@ -75,6 +76,12 @@ async function run() {
       const result = await movieCollection.deleteOne(query);
       res.send(result);
     });
+
+    app.post('/users', async(req, res) => {
+      const newUser = req.body;
+      const result = await userCollection.insertOne(newUser);
+      res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
