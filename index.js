@@ -26,10 +26,11 @@ async function run() {
     await client.connect();
 
     const movieCollection = client.db('movieDB').collection('movie');
+    const favMovieCollection = client.db('movieDB').collection('fav-movie');
     const userCollection = client.db('movieDB').collection('user');
 
     app.get('/addmovie', async(req, res) => {
-      const cursor = movieCollection.find();
+      const cursor = movieCollection.find().sort( { "rating": -1 } );
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -46,6 +47,13 @@ async function run() {
         console.log(newMovie)
         const result = await movieCollection.insertOne(newMovie);
         res.send(result);
+    });
+
+    app.post('/favourites/:id', async(req, res) => {
+      const favMovie = req.body;
+      console.log(favMovie)
+      const result = await favMovieCollection.insertOne(favMovie);
+      res.send(result);
     });
 
     app.put('/movie/:id', async(req, res) => {
