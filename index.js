@@ -49,10 +49,30 @@ async function run() {
         res.send(result);
     });
 
+    app.get('/favourites', async(req, res) => {
+      const cursor = favMovieCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get('/favourites/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await favMovieCollection.findOne(query);
+      res.send(result);
+    });
+
     app.post('/favourites/:id', async(req, res) => {
       const favMovie = req.body;
       console.log(favMovie)
       const result = await favMovieCollection.insertOne(favMovie);
+      res.send(result);
+    });
+
+    app.delete('/favourites/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: id}
+      const result = await favMovieCollection.deleteOne(query);
       res.send(result);
     });
 
